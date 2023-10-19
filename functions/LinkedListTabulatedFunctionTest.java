@@ -70,14 +70,75 @@ public class LinkedListTabulatedFunctionTest {
     }
 
     @Test
-    public void testinterpolate2() throws Exception {
+    public void testinterpolate1() throws Exception {
         double result = list.interpolate(3.7, 2);
         assertEquals(8.3, result, 1e-9);
     }
 
     @Test
-    public void testinterpolate5() throws Exception {
+    public void testinterpolate11() throws Exception {
         double result = list.interpolate(5.3, 4.8, 5.9, 9.4, 10.5);
         assertEquals(9.9, result, 1e-9);
     }
+
+    @Test
+    public void testToString() {
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(
+                new double[]{1.0, 2.0, 3.0},
+                new double[]{4.0, 5.0, 6.0}
+        );
+        String expected = "[(1.0; 4.0), (2.0; 5.0), (3.0; 6.0)]";
+        assertEquals(expected, function.toString());
+    }
+
+    @Test
+    public void testEquals() {
+        LinkedListTabulatedFunction function1 = new LinkedListTabulatedFunction(
+                new double[]{1.0, 2.0, 3.0},
+                new double[]{4.0, 5.0, 6.0}
+        );
+
+        LinkedListTabulatedFunction function2 = new LinkedListTabulatedFunction(
+                new double[]{1.0, 2.0, 3.0},
+                new double[]{4.0, 5.0, 6.0}
+        );
+
+        LinkedListTabulatedFunction function3 = new LinkedListTabulatedFunction(
+                new double[]{1.0, 2.0, 3.0},
+                new double[]{4.0, 5.0, 7.0} // Different y-values
+        );
+
+        assertTrue(function1.equals(function2));
+        assertFalse(function1.equals(function3));
+    }
+
+    @Test
+    public void testHashCode() {
+        LinkedListTabulatedFunction function1 = new LinkedListTabulatedFunction(
+                new double[]{1.0, 2.0, 3.0},
+                new double[]{4.0, 5.0, 6.0}
+        );
+
+        LinkedListTabulatedFunction function2 = new LinkedListTabulatedFunction(
+                new double[]{1.0, 2.0, 3.0},
+                new double[]{4.0, 5.0, 6.0}
+        );
+
+        assertEquals(function1.hashCode(), function2.hashCode());
+    }
+
+    @Test
+    public void testClone() {
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(
+                new double[]{1.0, 2.0, 3.0},
+                new double[]{4.0, 5.0, 6.0}
+        );
+
+        LinkedListTabulatedFunction clonedFunction = (LinkedListTabulatedFunction) function.clone();
+
+        assertTrue(function.equals(clonedFunction));
+        assertNotSame(function, clonedFunction);
+    }
+
+
 }

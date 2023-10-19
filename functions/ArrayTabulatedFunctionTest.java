@@ -3,6 +3,8 @@ package functions;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ArrayTabulatedFunctionTest {
@@ -71,14 +73,51 @@ class ArrayTabulatedFunctionTest {
     }
 
     @Test
-    public void testinterpolate2() throws Exception {
+    public void testinterpolate1() throws Exception {
         double result = arr.interpolate(3.7, 2);
         assertEquals(9.2, result, 1e-9);
     }
 
     @Test
-    public void testinterpolate5() throws Exception {
+    public void testinterpolate11() throws Exception {
         double result = arr.interpolate(5.3, 4.8, 5.9, 9.4, 10.5);
         assertEquals(9.9, result, 1e-9);
+    }
+
+    @Test
+    public void testToString() {
+        ArrayTabulatedFunction function = new ArrayTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{4.0, 5.0, 6.0});
+        String expected = "[(1.0; 4.0), (2.0; 5.0), (3.0; 6.0)]";
+        assertEquals(expected, function.toString());
+    }
+
+    @Test
+    public void testEquals() {
+        ArrayTabulatedFunction function1 = new ArrayTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{4.0, 5.0, 6.0});
+        ArrayTabulatedFunction function2 = new ArrayTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{4.0, 5.0, 6.0});
+        ArrayTabulatedFunction function3 = new ArrayTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{4.0, 5.0, 7.0});
+
+        assertTrue(function1.equals(function2));
+        assertFalse(function1.equals(function3));
+    }
+
+    @Test
+    public void testHashCode() {
+        ArrayTabulatedFunction function = new ArrayTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{4.0, 5.0, 6.0});
+
+        int xValuesHashCode = java.util.Arrays.hashCode(function.getXValues());
+        int yValuesHashCode = java.util.Arrays.hashCode(function.getYValues());
+        int expectedHashCode = xValuesHashCode * 31 + yValuesHashCode;
+
+        assertEquals(expectedHashCode, function.hashCode());
+    }
+
+    @Test
+    public void testClone() {
+        ArrayTabulatedFunction function = new ArrayTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{4.0, 5.0, 6.0});
+        ArrayTabulatedFunction clonedFunction = function.clone();
+
+        assertEquals(function, clonedFunction);
+        assertNotSame(function, clonedFunction);
     }
 }
