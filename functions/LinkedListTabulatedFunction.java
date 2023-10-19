@@ -1,17 +1,43 @@
 package functions;
 
-class Node {
-    public Node next;
-    public Node prev;
-    public double x;
-    public double y;
-    Node(double x, double y) {
-        this.x = x;
-        this.y = y;
-    }
-}
+
 
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
+    class Node {
+        public Node next;
+        public Node prev;
+        public double x;
+        public double y;
+        Node(double x, double y) {
+            this.x = x;
+            this.y = y;
+        }
+        @Override
+        public String toString() {
+            return "(" + x + "; " + y + ")";
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Node node = (Node) o;
+
+            return Double.compare(node.x, x) == 0 && Double.compare(node.y, y) == 0;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = Double.hashCode(x);
+            result = 31 * result + Double.hashCode(y);
+            return result;
+        }
+
+        public Node clone() {
+            return new Node(x, y);
+        }
+    }
     protected int count;
     private Node head;
     private void addNode(double x, double y) {
@@ -182,5 +208,62 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
                 return interpolate(x, floorIndexOfX(x));
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        Node currentNode = head;
+        for (int i = 0; i < count; i++) {
+            sb.append("(").append(currentNode.x).append("; ").append(currentNode.y).append(")");
+            if (i < count - 1) {
+                sb.append(", ");
+            }
+            currentNode = currentNode.next;
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LinkedListTabulatedFunction that = (LinkedListTabulatedFunction) o;
+        if (this.getCount() != that.getCount()) return false;
+        Node thisNode = this.head;
+        Node thatNode = that.head;
+        for (int i = 0; i < this.getCount(); i++) {
+            if (thisNode.x != thatNode.x || thisNode.y != thatNode.y) return false;
+            thisNode = thisNode.next;
+            thatNode = thatNode.next;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 1;
+        Node currentNode = head;
+        for (int i = 0; i < count; i++) {
+            result = 31 * result + Double.hashCode(currentNode.x);
+            result = 31 * result + Double.hashCode(currentNode.y);
+            currentNode = currentNode.next;
+        }
+        return result;
+    }
+
+    @Override
+    public Object clone() {
+        double[] clonedXValues = new double[count];
+        double[] clonedYValues = new double[count];
+        Node currentNode = head;
+        for (int i = 0; i < count; i++) {
+            clonedXValues[i] = currentNode.x;
+            clonedYValues[i] = currentNode.y;
+            currentNode = currentNode.next;
+        }
+        return new LinkedListTabulatedFunction(clonedXValues, clonedYValues);
     }
 }

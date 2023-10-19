@@ -148,4 +148,48 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction {
         }
 
     }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        for (int i = 0; i < count; i++) {
+            builder.append("(").append(xValues[i]).append("; ").append(yValues[i]).append(")");
+            if (i < count - 1) {
+                builder.append(", ");
+            }
+        }
+        builder.append("]");
+        return builder.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ArrayTabulatedFunction that = (ArrayTabulatedFunction) o;
+
+        if (count != that.count) return false;
+        return Arrays.equals(xValues, that.xValues) && Arrays.equals(yValues, that.yValues);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Arrays.hashCode(xValues);
+        result = 31 * result + Arrays.hashCode(yValues);
+        return result;
+    }
+
+    public ArrayTabulatedFunction clone() {
+        return new ArrayTabulatedFunction(Arrays.copyOf(xValues, count), Arrays.copyOf(yValues, count));
+    }
+
+    public double[] getXValues() {
+        return xValues;
+    }
+
+    public double[] getYValues() {
+        return yValues;
+    }
 }
