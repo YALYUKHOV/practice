@@ -1,5 +1,8 @@
 package functions;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 public class MockTabulatedFunction extends AbstractTabulatedFunction {
     private double x0, x1, y0, y1;
 
@@ -103,5 +106,32 @@ public class MockTabulatedFunction extends AbstractTabulatedFunction {
     @Override
     protected double extrapolateRight(double x) {
         return y1;
+    }
+
+
+    @Override
+    public Iterator<Point> iterator() {
+        return new Iterator<Point>() {
+            private int currentIndex = 0;
+
+            @Override
+            public boolean hasNext() {
+                return currentIndex < count;
+            }
+
+            @Override
+            public Point next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                if (currentIndex == 0) {
+                    currentIndex++;
+                    return new Point(x0, y0);
+                } else {
+                    currentIndex++;
+                    return new Point(x1, y1);
+                }
+            }
+        };
     }
 }

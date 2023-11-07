@@ -1,9 +1,33 @@
 package functions;
 
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
-    class Node {
+
+    @Override
+    public Iterator<Point> iterator() {
+        return new Iterator<Point>() {
+            private Node node = head;
+
+            @Override
+            public boolean hasNext() {
+                return node != null;
+            }
+
+            @Override
+            public Point next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException("No more elements in the tabulated function.");
+                }
+                Point point = new Point(node.x, node.y);
+                node = node.next;
+                return point;
+            }
+        };
+    }
+    static class Node {
         public Node next;
         public Node prev;
         public double x;
@@ -12,6 +36,8 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
             this.x = x;
             this.y = y;
         }
+
+
         @Override
         public String toString() {
             return "(" + x + "; " + y + ")";
@@ -39,6 +65,8 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
         }
     }
     protected int count;
+
+
     private Node head;
     private void addNode(double x, double y) {
         Node newNode = new Node(x, y);
@@ -60,6 +88,12 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
         for (int i = 0; i < xValues.length; i++) {
             addNode(xValues[i], yValues[i]);
         }
+
+        // Проверка на одинаковую длину массивов
+        AbstractTabulatedFunction.checkLengthIsTheSame(xValues, yValues);
+
+        // Проверка на сортировку массива xValues
+        AbstractTabulatedFunction.checkSorted(xValues);
     }
     public LinkedListTabulatedFunction(MathFunction source, double xFrom, double xTo, int count) {
         if (xTo - xFrom > 1e-9) {
@@ -103,9 +137,18 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
         }
     }
     public double getX(int index) {
+        if (index < 0 || index >= count) {
+            throw new IllegalArgumentException("Index is out of bounds");
+        }
         return getNode(index).x;
     }
+
+
+
     public double getY(int index) {
+        if (index < 0 || index >= count) {
+            throw new IllegalArgumentException("Index is out of bounds");
+        }
         return getNode(index).y;
     }
     public void setY(int index, double y) {
@@ -146,6 +189,15 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
             return index;
     }
     public int floorIndexOfX(double x) {
+
+        if (x < leftBound()) {
+            throw new IllegalArgumentException("x is below the left table boundary");
+        }
+        if (x > rightBound()) {
+            throw new IllegalArgumentException("x is above the right table boundary");
+        }
+
+
         if (head.x - x > 1e-9)
             return 0;
         else if (head.prev.x - x < 1e-9)

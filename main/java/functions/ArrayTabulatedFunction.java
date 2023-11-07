@@ -1,19 +1,63 @@
 package functions;
 
+import exceptions.InterpolationException;
+
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.pow;
+import static org.junit.Assert.assertThrows;
+
 public class ArrayTabulatedFunction extends AbstractTabulatedFunction {
     private final double[] xValues;
     private final double[] yValues;
     protected int count;
+
+    @Override
+    public Iterator<Point> iterator() {
+        return new Iterator<Point>() {
+            private int i = 0;
+
+            @Override
+            public boolean hasNext() {
+                return i < count;
+            }
+
+            @Override
+            public Point next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException("No more elements in the tabulated function.");
+                }
+
+                Point point = new Point(xValues[i], yValues[i]);
+                i++;
+                return point;
+            }
+        };
+    }
+
+
     public ArrayTabulatedFunction(double[] xValues, double[] yValues ){
+        if (xValues.length < 2 || yValues.length < 2) {
+            throw new IllegalArgumentException("Table length must be at least 2 points");
+        }
+
+        // Проверка на одинаковую длину массивов
+        AbstractTabulatedFunction.checkLengthIsTheSame(xValues, yValues);
+
+        // Проверка на сортировку массива xValues
+        AbstractTabulatedFunction.checkSorted(xValues);
+
         this.xValues = Arrays.copyOf(xValues, xValues.length);
         this.yValues = Arrays.copyOf(yValues, yValues.length);
         count = xValues.length;
     }
     public ArrayTabulatedFunction(MathFunction source, double xFrom, double xTo, int count){
+        if (count < 2) {
+            throw new IllegalArgumentException("Table length must be at least 2 points");
+        }
         xValues = new double[count];
         yValues = new double[count];
         double epsilon;
@@ -47,15 +91,31 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction {
     {
         return count;
     }
-    public double getX(int index){
+    public double getX(int index) {
+        if (index < 0 || index >= count) {
+            throw new ArrayIndexOutOfBoundsException("Index is out of bounds");
+        }
         return xValues[index];
     }
-    public double getY(int index){
+    public double getY(int index) {
+        if (index < 0 || index >= count) {
+            throw new ArrayIndexOutOfBoundsException("Index is out of bounds");
+        }
         return yValues[index];
     }
-    public void setY(int index, double val){
-        yValues[index]= val;
+    public void setY(int index, double val) {
+        if (index < 0 || index >= count) {
+            throw new ArrayIndexOutOfBoundsException("Index is out of bounds");
+        }
+        yValues[index] = val;
     }
+    public void setX(int index, double val) {
+        if (index < 0 || index >= count) {
+            throw new ArrayIndexOutOfBoundsException("Index is out of bounds");
+        }
+        xValues[index] = val;
+    }
+
     public double leftBound(){
         return xValues[0];
     }
@@ -85,6 +145,9 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction {
 
     @Override
     public int floorIndexOfX(double x) {
+        if (x < leftBound()) {
+            throw new IllegalArgumentException("x is less than the left bound");
+        }
         int i = 0;
         if (xValues[i] - x > 1e-9)
             return 0;
@@ -116,6 +179,9 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction {
         if (count==1)
             return yValues[0];
         else {
+            if (x < xValues[floorIndex] || x > xValues[floorIndex + 1]) {
+                throw new InterpolationException("Value x is outside the interpolation interval.");
+            }
             double rightX = getX(floorIndex);
             double leftX = getX(floorIndex - 1);
             double rightY = getY(floorIndex);
@@ -132,6 +198,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction {
 
     @Override
     public double apply(double x) {
+
         if(xValues[0]-x>1e-9){
             return extrapolateLeft(x);
         }
