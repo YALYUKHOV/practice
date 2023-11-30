@@ -28,4 +28,17 @@ public class TabulatedDifferentialOperatorTest {
         assertEquals(2.0, derivative_function.getY(3));
         assertEquals(2.0, derivative_function.getY(4));
     }
+
+    @Test
+    void deriveSynchronouslyTest() {
+        double[] xValues = {0.0, 1.0, 2.0};
+        double[] yValues = {1.0, 2.0, 4.0};
+        TabulatedFunction function = new ArrayTabulatedFunction(xValues, yValues);
+
+        TabulatedDifferentialOperator operator = new TabulatedDifferentialOperator();
+        TabulatedFunction result = operator.deriveSynchronously(function);
+
+        assertEquals(1.0, result.getY(0)); // The derivative of x^2 is 2x, so at x = 0, the result should be 2 * 0 = 0
+        assertEquals(2.0, result.getY(1)); // The derivative of x^2 is 2x, so at x = 2, the result should be 2 * 2 = 4
+    }
 }
